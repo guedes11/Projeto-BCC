@@ -1,1 +1,0 @@
-PermissionError: [WinError 32] O arquivo já está sendo usado por outro processo: 'C:\\Users\\kevem\\AppData\\Local\\Temp\\openpyxl._ecfs6mq'
