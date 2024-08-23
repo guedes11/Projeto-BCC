@@ -17,12 +17,11 @@ caminho = './Tabelas'
 for ano, arquivo in enumerate(listdir(caminho)):
 
     # Abrindo o arquivo .xlsx atual.
-    pasta_trabalho = load_workbook(caminho + '/' + arquivo)
+    pasta_trabalho = load_workbook(caminho + '/' + arquivo, read_only=False, data_only=False)
     planilha = pasta_trabalho.active
-    planilha.delete_rows(0)
 
     # Percorrendo cada linha e coluna do arquivo.
-    for linha in range(1, planilha.max_row + 1):
+    for linha in range(2, planilha.max_row + 1):
         for coluna in range(1, planilha.max_column + 1):
             celula = planilha.cell(row=linha, column=coluna).value
 
