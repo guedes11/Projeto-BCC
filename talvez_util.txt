@@ -1,0 +1,20 @@
+# Total de elementos
+num_elementos = (len(pontos_por_temporada) + len(vitorias_por_temporada)) / 2
+
+# Medias das vitórias e pontos
+media_pontos = sum(pontos_por_temporada) / num_elementos
+media_vitorias = sum(vitorias_por_temporada) / num_elementos
+
+# Variancia das vitórias e pontos
+variancia_pontos = sum([(valor - media_pontos)**2 for valor in pontos_por_temporada]) / num_elementos
+variancia_vitorias = sum([(valor - media_vitorias)**2 for valor in vitorias_por_temporada]) / num_elementos
+
+# Desvio padrão das vitórias e pontos
+desvio_padrao_pontos = variancia_pontos ** 0.5
+desvio_padrao_vitorias = variancia_vitorias ** 0.5
+
+# Calculo da Covariancia entre vitórias e pontos
+covariancia = sum([(vitorias_por_temporada[i] - media_vitorias) * (pontos_por_temporada[i] - media_pontos) for i in range(0, 10)]) / num_elementos
+
+# Calculo da correlação entre vitórias e pontos
+correlacao = covariancia / (desvio_padrao_pontos * desvio_padrao_vitorias)

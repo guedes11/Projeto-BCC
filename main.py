@@ -29,42 +29,64 @@ urls = [
 pontos_por_temporada = []
 vitorias_por_temporada = []
 
-# Percorrendo a pasta Tabelas.
+# Iterando sobre a lista de Dataframes
 for arquivo in extrai_tabelas_da_url(urls):
-
-    # Lendo e transformando o arquivo .csv em Dataframe.
-    arquivo_atual = arquivo
-
     # Deletando as linhas e colunas irrelevantes.
-    arquivo_atual = arquivo_atual.drop(axis=0, index=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19])
+    arquivo = arquivo.drop(axis=0, index=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19])
     
-    if "Classificação ou descenso" in arquivo_atual.columns:
-        arquivo_atual.pop("Classificação ou descenso")
+    # Tratando uma coluna específica que varia de nome
+    if "Classificação ou descenso" in arquivo.columns:
+        arquivo.pop("Classificação ou descenso")
     else:
-        arquivo_atual.pop("Unnamed: 10")
+        arquivo.pop("Unnamed: 10")
     
-    # Removendo possiveis caracteres que não sejam numeros da coluna Pts, transformando em numeros e somando posteriormente
-    arquivo_atual["Pts"] = arquivo_atual["Pts"].apply(lambda pontos: re.sub(r'\D', '', str(pontos)))
-    arquivo_atual["Pts"] = to_numeric(arquivo_atual["Pts"])
+    # Removendo possiveis caracteres que não sejam numeros da coluna Pts, transformando em numeros e somando posteriormente.
+    arquivo["Pts"] = arquivo["Pts"].apply(lambda pontos: re.sub(r'\D', '', str(pontos)))
+    arquivo["Pts"] = to_numeric(arquivo["Pts"])
 
-    pontos_por_temporada.append(int(arquivo_atual["Pts"]))
+    pontos_por_temporada.append(int(arquivo["Pts"].iloc[0]))
 
-    arquivo_atual["V"] = to_numeric(arquivo_atual["V"])
-    vitorias_por_temporada.append(int(arquivo_atual["V"]))
+    arquivo["V"] = to_numeric(arquivo["V"])
+    vitorias_por_temporada.append(int(arquivo["V"].iloc[0]))
 
 
-num_elementos = (len(pontos_por_temporada) + len(vitorias_por_temporada)) / 2
+x_temporadas = [ano for ano in range(2014, 2024)]
 
-media_pontos = sum(pontos_por_temporada) / num_elementos
-media_vitorias = sum(vitorias_por_temporada) / num_elementos
+# Criação do gráfico de pontos por temporada.
+fig, ax = plt.subplots()
+ax.plot(x_temporadas, pontos_por_temporada)
+ax.set_xticks(x_temporadas)
+ax.grid()
 
-variancia_pontos = sum([(valor - media_pontos)**2 for valor in pontos_por_temporada]) / num_elementos
-variancia_vitorias = sum([(valor - media_vitorias)**2 for valor in vitorias_por_temporada]) / num_elementos
+plt.xlabel("Temporada")
+plt.ylabel("Pontuação final")
+plt.title("Pontuação final do 17° colocado (2014-2023).")
+plt.savefig("./Graficos/pontosXtemporada.png")
+plt.show()
 
-desvio_padrao_pontos = variancia_pontos ** 0.5
-desvio_padrao_vitorias = variancia_vitorias ** 0.5
+# Criação do gráfico de vitórias por temporada.
+fig, ax = plt.subplots()
+ax.plot(x_temporadas, vitorias_por_temporada)
+ax.set_xticks(x_temporadas)
+ax.grid()
 
-covariancia = sum([(vitorias_por_temporada[i] - media_vitorias) * (pontos_por_temporada[i] - media_pontos) for i in range(0, 10)]) / num_elementos
+plt.xlabel("Temporada")
+plt.ylabel("Pontuação final")
+plt.title("Total de vitórias do 17° colocado (2014-2023).")
+plt.savefig("./Graficos/vitoriasXtemporada.png")
+plt.show()
 
-correlação = covariancia / (desvio_padrao_pontos * desvio_padrao_vitorias)
+# Criação do gráfico de correlação de vitorias/pontos do 17° colocado.
+plt.scatter(pontos_por_temporada, vitorias_por_temporada)
+plt.xlabel("Pontos")
+plt.ylabel("Vitórias")
+plt.title("Correlação entre Vitórias e Pontos no Brasileirão (2014-2023)")
 
+# Criação da linha de tendencia do gráfico de vitorias x pontos
+z = np.polyfit(pontos_por_temporada, vitorias_por_temporada, 1)
+p = np.poly1d(z)
+
+plt.plot(pontos_por_temporada, p(pontos_por_temporada))
+plt.savefig("./Graficos/correlacaoVitorias_Pontos.png")
+
+plt.show()
