@@ -11,6 +11,7 @@ def extrai_tabelas_da_url(urls: list):
 
         # Filtra a tabela de Confronto pela sua dimensão e transforma em um arquivo .xlsx
         for tabela in lista_tabelas:
-            if tabela.shape == (20,21):
+            if tabela.shape == (20, 11):
                 dataframe = DataFrame(tabela)
-                dataframe.to_excel(f"{caminho}/TabelaJogos{ano + 2013}.xlsx")
+                dataframe.to_csv(f"{caminho}/TabelaJogos{ano + 2013}.csv")
+
