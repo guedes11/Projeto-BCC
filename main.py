@@ -2,7 +2,7 @@ from pandas import read_html, to_numeric, DataFrame
 from requests import get
 from io import StringIO
 import matplotlib.pyplot as plt
-import numpy as np
+from numpy import polyfit, poly1d
 import re
 
 
@@ -20,6 +20,7 @@ def extrai_tabelas_da_url(links: list):
                 lista_dataframe.append(dataframe)
     return lista_dataframe
                 
+
 urls = [
         f"https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol_de_{ano}_-_Série_A"
         for ano in range(2013, 2024)
@@ -82,10 +83,10 @@ plt.ylabel("Vitórias")
 plt.title("Correlação entre Vitórias e Pontos no Brasileirão (2013-2023)")
 
 # Criação da linha de tendencia do gráfico de vitorias x pontos
-z = np.polyfit(pontos_por_temporada, vitorias_por_temporada, 1)
-p = np.poly1d(z)
+coeficientes = polyfit(pontos_por_temporada, vitorias_por_temporada, 1)
+polinomio = poly1d(coeficientes)
 
-plt.plot(pontos_por_temporada, p(pontos_por_temporada))
+plt.plot(pontos_por_temporada, polinomio(pontos_por_temporada), 'g-')
 plt.savefig("./Graficos/correlacaoVitorias_Pontos.png")
 
 plt.show()
