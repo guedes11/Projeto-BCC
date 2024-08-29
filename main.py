@@ -1,53 +1,51 @@
 from io import StringIO
-from pandas import read_html, to_numeric, DataFrame
+from pandas import read_html, DataFrame
 from numpy import polyfit, poly1d
 from requests import get
 import matplotlib.pyplot as plt
-import re
 
 
-# Extrai a Tabela de Confrontos de cada Edição do Brasileirão de 2013 até 2023
-def extrai_tabelas_da_url(links: list, hearders: dict):
-    lista_dataframe = []
-    for link in links:
-        requisicao = get(link, headers=hearders)
-        lista_tabelas = read_html(StringIO(requisicao.text))
+# cabeçalho de requisição
+cabecalhos = {
+    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0'
+    }
 
-        # Filtra a tabela de Confronto pela sua dimensão e transforma em um arquivo .xlsx
-        for tabela in lista_tabelas:
-            if tabela.shape == (20, 10):
-                dataframe = DataFrame(tabela)
-                lista_dataframe.append(dataframe)
-    return lista_dataframe
-                
-
-cabecalhos = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'}
+# lista de urls
 urls = [
     f"https://www.transfermarkt.com.br/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1?saison_id={ano}" for ano in range(2012, 2023)
     ]
+
+# Extrai a Tabela Classificação de cada Edição do Brasileirão de 2013 até 2023
+lista_dataframe = []
+for link in urls:
+    requisicao = get(link, headers=cabecalhos)
+    lista_tabelas = read_html(StringIO(requisicao.text))
+
+    # Percorrendo a lista_tabelas.
+    for tabela in lista_tabelas:
+        # filtrando a tabela pela sua dimensão.
+        if tabela.shape == (20, 10):
+            # convertendo a tabela em um Dataframe.
+            dataframe = DataFrame(tabela)
+            lista_dataframe.append(dataframe)
 
 
 pontos_por_temporada = []
 vitorias_por_temporada = []
 
-# Iterando sobre a lista de DataframesL
-for arquivo in extrai_tabelas_da_url(urls, cabecalhos):
-    # Deletando as linhas e colunas irrelevantes.
-    arquivo = arquivo.drop(axis=0, index=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19])
+# Iterando sobre a lista de Dataframes
+for arquivo in lista_dataframe:
 
-    # Removendo possiveis caracteres que não sejam numeros da coluna Pts, transformando em numeros e somando posteriormente.
-    arquivo["Pts"] = arquivo["Pts"].apply(lambda pontos: re.sub(r'\D', '', str(pontos)))
-    arquivo["Pts"] = to_numeric(arquivo["Pts"])
+    # Selecionando o total de pontos e vitórias do 17° colocado.
+    arquivo = arquivo.loc[16, ["Pts", "V"]]
 
-    pontos = int(arquivo["Pts"].iloc[0])
-    pontos_por_temporada.append(44 if pontos == 443 else pontos)
-
-    arquivo["V"] = to_numeric(arquivo["V"])
+    # Armazenando o total de pontos da temporada em uma lista
+    pontos_por_temporada.append(arquivo["Pts"])
     
-    vitorias = int(arquivo["V"].iloc[0])
-    vitorias_por_temporada.append(vitorias)
+    # Armazenando o total de vitórias da temporada em uma lista
+    vitorias_por_temporada.append(arquivo["V"])
 
-x_temporadas = [ano for ano in range(2013, 2024)]
+x_temporadas = range(2013, 2024)
 
 # Criação do gráfico de pontos por temporada.
 fig, ax = plt.subplots()
@@ -56,7 +54,7 @@ ax.set_xticks(x_temporadas)
 ax.grid()
 
 plt.xlabel("Temporada")
-plt.ylabel("Pontuação final")
+plt.ylabel("Pontuação")
 plt.title("Pontuação final do 17° colocado (2013-2023).")
 plt.savefig("./Graficos/pontosXtemporada.png")
 plt.show()
@@ -68,7 +66,7 @@ ax.set_xticks(x_temporadas)
 ax.grid()
 
 plt.xlabel("Temporada")
-plt.ylabel("Total vitórias")
+plt.ylabel("Vitórias")
 plt.title("Total de vitórias do 17° colocado (2013-2023).")
 plt.savefig("./Graficos/vitoriasXtemporada.png")
 plt.show()
