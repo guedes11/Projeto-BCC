@@ -1,8 +1,8 @@
-from pandas import read_html, to_numeric, DataFrame
-from requests import get
 from io import StringIO
-import matplotlib.pyplot as plt
+from pandas import read_html, to_numeric, DataFrame
 from numpy import polyfit, poly1d
+from requests import get
+import matplotlib.pyplot as plt
 import re
 
 
@@ -30,13 +30,10 @@ urls = [
 pontos_por_temporada = []
 vitorias_por_temporada = []
 
-# Iterando sobre a lista de Dataframes
+# Iterando sobre a lista de DataframesL
 for arquivo in extrai_tabelas_da_url(urls, cabecalhos):
     # Deletando as linhas e colunas irrelevantes.
     arquivo = arquivo.drop(axis=0, index=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19])
-
-    if "P" in arquivo.columns:
-        arquivo = arquivo.rename(columns={"P": "Pts"})
 
     # Removendo possiveis caracteres que não sejam numeros da coluna Pts, transformando em numeros e somando posteriormente.
     arquivo["Pts"] = arquivo["Pts"].apply(lambda pontos: re.sub(r'\D', '', str(pontos)))
@@ -77,16 +74,15 @@ plt.savefig("./Graficos/vitoriasXtemporada.png")
 plt.show()
 
 # Criação do gráfico de correlação de vitorias/pontos do 17° colocado.
-plt.scatter(pontos_por_temporada, vitorias_por_temporada)
-plt.xlabel("Pontos")
-plt.ylabel("Vitórias")
+plt.scatter(vitorias_por_temporada, pontos_por_temporada)
+plt.xlabel("Vitórias")
+plt.ylabel("Pontos")
 plt.title("Correlação entre Vitórias e Pontos no Brasileirão (2013-2023)")
 
 # Criação da linha de tendencia do gráfico de vitorias x pontos
-coeficientes = polyfit(pontos_por_temporada, vitorias_por_temporada, 1)
+coeficientes = polyfit(vitorias_por_temporada, pontos_por_temporada, 1)
 polinomio = poly1d(coeficientes)
 
-plt.plot(pontos_por_temporada, polinomio(pontos_por_temporada), 'g-')
+plt.plot(vitorias_por_temporada, polinomio(vitorias_por_temporada), 'g-')
 plt.savefig("./Graficos/correlacaoVitorias_Pontos.png")
-
 plt.show()
