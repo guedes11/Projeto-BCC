@@ -7,31 +7,31 @@ import re
 
 
 # Extrai a Tabela de Confrontos de cada Edição do Brasileirão de 2013 até 2023
-def extrai_tabelas_da_url(links: list):
+def extrai_tabelas_da_url(links: list, hearders: dict):
     lista_dataframe = []
     for link in links:
-        requisicao = get(link)
+        requisicao = get(link, headers=hearders)
         lista_tabelas = read_html(StringIO(requisicao.text))
 
         # Filtra a tabela de Confronto pela sua dimensão e transforma em um arquivo .xlsx
         for tabela in lista_tabelas:
-            if tabela.shape == (20, 11) or tabela.shape == (20, 12) or tabela.shape == (20, 13):
+            if tabela.shape == (20, 10):
                 dataframe = DataFrame(tabela)
                 lista_dataframe.append(dataframe)
     return lista_dataframe
                 
 
+cabecalhos = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'}
 urls = [
-        f"https://pt.wikipedia.org/wiki/Campeonato_Brasileiro_de_Futebol_de_{ano}_-_Série_A"
-        for ano in range(2013, 2024)
-       ]
+    f"https://www.transfermarkt.com.br/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1?saison_id={ano}" for ano in range(2012, 2023)
+    ]
 
 
 pontos_por_temporada = []
 vitorias_por_temporada = []
 
 # Iterando sobre a lista de Dataframes
-for arquivo in extrai_tabelas_da_url(urls):
+for arquivo in extrai_tabelas_da_url(urls, cabecalhos):
     # Deletando as linhas e colunas irrelevantes.
     arquivo = arquivo.drop(axis=0, index=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19])
 

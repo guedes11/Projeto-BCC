@@ -6,7 +6,7 @@
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-@set "VIRTUAL_ENV=C:\AnaliseEstatisticaUnivariada\venv"
+@set "VIRTUAL_ENV=C:\Desenvolvimento\AnaliseEstatistica\venv"
 
 @set "VIRTUAL_ENV_PROMPT="
 @if NOT DEFINED VIRTUAL_ENV_PROMPT (
