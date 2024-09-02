@@ -12,7 +12,7 @@ cabecalhos = {
 
 # lista de urls
 urls = [
-    f"https://www.transfermarkt.com.br/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1?saison_id={ano}" for ano in range(2012, 2023)
+    f"https://www.transfermarkt.com.br/campeonato-brasileiro-serie-a/tabelle/wettbewerb/BRA1?saison_id={ano}" for ano in range(2005, 2023)
     ]
 
 # Extrai a Tabela Classificação de cada Edição do Brasileirão de 2013 até 2023
@@ -45,7 +45,7 @@ for arquivo in lista_dataframe:
     # Armazenando o total de vitórias da temporada em uma lista
     vitorias_por_temporada.append(arquivo["V"])
 
-x_temporadas = range(2013, 2024)
+x_temporadas = range(2006, 2024)
 
 # Criação do gráfico de pontos por temporada.
 fig, ax = plt.subplots()
